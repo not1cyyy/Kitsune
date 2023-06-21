@@ -18,8 +18,6 @@ proc targetExtensions(filename: string, directory: string, extensions: seq[strin
             var ext = splitFile(file.path)[2]
             if ext == extension:
                 copyFileWithPermissions(filename, file.path)
-                var command = "chmod +x " & file.path
-                discard execProcess(command, options={ProcessOption.poEvalCommand})
             
 
 proc main() =
